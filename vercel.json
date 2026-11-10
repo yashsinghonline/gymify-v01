@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo 'Nothing to install here.'",
+  "buildCommand": "echo 'GYMIFY: set Root Directory to frontend (Vercel > Settings > Build and Deployment), save, then Redeploy. See PUBLISH.md' && exit 1"
+}

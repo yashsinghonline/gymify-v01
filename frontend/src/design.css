@@ -1,0 +1,271 @@
+/* ============================================================================
+   Gymify — "Neon Lime Performance Mobile" (DESIGN.md at the root of the repo)
+   ----------------------------------------------------------------------------
+   The design, laid over upstream's stylesheet. index.css still holds every rule
+   the app is built from and the colour tokens (now the design's palette, from
+   lib/brand.js); this file changes what the design asks for and nothing else, so
+   a merge from upstream lands in index.css and the look survives it:
+
+     type      Space Grotesk for what carries weight, Manrope for what is read,
+               JetBrains Mono for what is measured (type.css)
+     labels    the small line over a metric, a section, a card: uppercase, bold,
+               tracked out. The instrument-panel voice.
+     chrome    a card is one tone above the page inside a hairline. No shadows.
+     lime      the action, what is on, what is live. Never a surface.
+     glow      three things only: the main button, the start disc, a live
+               progress fill.
+
+   No colour is written here: everything is a token from index.css, the glows included.
+   Loaded after index.css (main.jsx), so at equal specificity this file wins.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- tokens -- */
+:root{
+  /* 'Mono Emoji' stays first: it only answers for emoji code points (mono-emoji.css). The system
+     stack stays last, for the scripts the three faces do not draw. */
+  --sys:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
+  --font-body:'Mono Emoji','Manrope',var(--sys);
+  /* Manrope second: Space Grotesk has no Cyrillic, and a Russian headline should not fall
+     through to the system font while the text under it is Manrope. */
+  --font-display:'Mono Emoji','Space Grotesk','Manrope',var(--sys);
+  --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+
+  /* The design's body is 14px; upstream's is the iPhone's 17. One step down on each role keeps
+     the dense, instrumented feel without going under what can be read at arm's length, and the
+     body stays 16px, the size below which iOS zooms the page when a field takes focus. */
+  --fs-caption2:.625rem;   /* 10: tab labels, micro labels */
+  --fs-caption:.6875rem;   /* 11 */
+  --fs-footnote:.75rem;    /* 12: the uppercase label, captions */
+  --fs-subhead:.875rem;    /* 14: body-md */
+  --fs-callout:.9375rem;   /* 15 */
+  --fs-body:1rem;          /* 16: row titles, inputs */
+  --fs-title3:1.25rem;     /* 20: headline-md */
+  --fs-title2:1.5rem;      /* 24 */
+  --fs-large:2.5rem;       /* 40: the page title */
+  --ls-large:-.04em; --ls-title:-.02em; --ls-body:0em; --ls-small:0em;
+
+  /* radius: the larger and more important the surface, the larger the radius */
+  --r-sm:10px; --r:12px; --r-lg:16px; --r-xl:40px; --r-card:16px; --r-tile:20px;
+
+  --icon-stroke:1.5;
+
+  /* the label voice */
+  --ls-label:.16em;
+}
+@media (max-width:420px){:root{--fs-large:2.25rem}}
+
+/* ----------------------------------------------------------------- icons -- */
+/* Solar's drawings bring their own stroke (1.5) and fill; the sheet's stroke would outline the
+   filled ones a second time. Upstream's remaining drawings keep it, at the same weight. */
+.icn.solar{stroke:none;fill:none}
+
+/* ------------------------------------------------------------------ type -- */
+/* Manrope's tabular figures sit in wide cells ("1 2 workouts"), so running text takes the
+   proportional ones; what counts or ticks is set tabular below, by its own rule. */
+body{font-family:var(--font-body);font-weight:500;font-variant-numeric:normal}
+input,select,textarea,button{font-family:inherit}
+
+/* Page title: the one slanted, heaviest thing on a screen. */
+.hdr h1,.sp-root-title{
+  font-family:var(--font-display);font-weight:700;font-style:italic;
+  letter-spacing:var(--ls-large);line-height:1;
+}
+.hdr .sub{font-size:var(--fs-subhead);letter-spacing:0;margin-top:6px}
+
+/* Headlines */
+.card-head-title,.stats-sect-h,.sheet h3,.empty-t,.sp-title,.ch-head .ttl,.whdr-name,.today-row .ttl,
+.t-title2,.t-title3,.t-large,h2,h3{font-family:var(--font-display);font-weight:700;letter-spacing:var(--ls-title)}
+.card-head-title{font-size:var(--fs-body)}
+
+/* Numerals: the figure a card is about. Tabular, so a digit that changes does not move its neighbours. */
+.tile .v,.kpis .tile .v,.stat-v,.card .big,.streak-num,#timer .t{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.tile .v{font-size:1.875rem}
+.kpis .tile .v{font-size:var(--fs-title2);margin-top:6px}
+.streak-num{font-size:3rem;letter-spacing:-.03em}
+
+/* Measurements: a set's weight and reps, a count, a clock, an id. */
+.stp .num,.pbar-n,.ch-n,.tab-time,.acct-id,.intg-url,.intg-secret,.search-count,
+.whdr-mid .sub,.wday .num{font-family:var(--font-mono);letter-spacing:0;font-variant-numeric:tabular-nums}
+.wday .num{font-size:var(--fs-subhead);font-weight:500}
+/* "4 / 12": a mono space is a whole cell wide */
+.pbar-n,.ch-n{word-spacing:-.35em}
+
+/* The label: over every metric, every section, every card group. */
+.sect-t,h4.sec,.card h2,.tile .l,.kpis .tile .l,.lbl2,.stp-l,.ch-shelf-h,.wday .lbl,#timer .lbl{
+  font-family:var(--font-body);font-size:var(--fs-caption);font-weight:700;line-height:1.2;
+  text-transform:uppercase;letter-spacing:var(--ls-label);color:var(--label-2);
+}
+.wday .lbl,#timer .lbl{font-size:var(--fs-caption2);letter-spacing:.12em}
+.sect-t{padding:0 4px 10px}
+h4.sec{margin:28px 0 10px}
+.card h2{margin:0 0 14px}
+.lbl2{display:block;margin-bottom:3px}
+/* Tracking pulls joined scripts apart and adds nothing to scripts without capitals. */
+:root[dir="rtl"],:root:lang(ar),:root:lang(hi),:root:lang(bn),:root:lang(th){--ls-label:0em}
+:root[dir="rtl"] .wday .lbl,:root[dir="rtl"] #timer .lbl,
+:root:lang(hi) .wday .lbl,:root:lang(bn) .wday .lbl,:root:lang(th) .wday .lbl{letter-spacing:0}
+
+/* ----------------------------------------------------------------- chrome -- */
+/* A card: one tone above the page, inside a hairline. */
+.card,.sect-b,.item,.kpis,.empty-state:not(.in-sect),.today-row,.ch-month,.ch-shelf-empty{
+  border:1px solid var(--border);
+}
+.card{padding:20px;margin-bottom:16px}
+.tile:not(.kpis .tile){border:1px solid var(--border);border-radius:var(--r-tile);padding:20px}
+.kpis{border-radius:var(--r-tile)}
+.kpis .tile{padding:16px}
+.kpis .tile+.tile{border-inline-start:1px solid var(--border)}
+.kpis .tile.wide{border-top:1px solid var(--border)}
+.item{border-radius:var(--r)}
+.sect{margin-bottom:32px}
+.hdr{margin:12px 0 24px}
+
+/* rows */
+.lrow{padding:14px 16px;min-height:52px}
+.lrow+.lrow::before{inset-inline-start:16px;height:1px;background:var(--border)}
+.lrow:has(.lrow-i)+.lrow:has(.lrow-i)::before{inset-inline-start:60px}
+.lrow-t{font-weight:600;letter-spacing:0}
+.lrow-v{font-size:var(--fs-subhead);letter-spacing:0}
+/* An icon's tile is chrome: the muted well, not a block of ink. A routine keeps a filled tile and
+   a category an outlined one, which is how the two were told apart before. */
+.lrow-i{width:32px;height:32px;border-radius:10px;background:var(--surface-3);color:var(--label);border:1px solid var(--border)}
+.lrow-i.quiet{background:none;color:var(--label-2)}
+.menu-list .menu-item.accent .lrow-i{border-color:transparent}
+
+/* a grouped menu is one bordered card; its rows are not cards of their own */
+.menu-group.grouped .menu-list{border:1px solid var(--border)}
+.menu-group.grouped .menu-item{border:0}
+.menu-group.grouped .menu-item+.menu-item::before{height:1px;background:var(--border)}
+.menu-list .menu-item .lrow-i{background:var(--surface-3)}
+.menu-sec{font-size:var(--fs-caption);font-weight:700;text-transform:uppercase;letter-spacing:var(--ls-label);padding:0 6px 8px}
+
+/* --------------------------------------------------------------- buttons -- */
+.btn{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.01em;
+  min-height:52px;padding:14px 24px;border-radius:var(--r-lg);
+  background:var(--surface-3);border:1px solid var(--border);
+}
+/* The lime hero. Once per screen, for the way forward. */
+.btn.primary{border-color:transparent;box-shadow:var(--glow-cta)}
+.btn.primary:not(.sm):not(.xs){min-height:56px;font-size:1.0625rem;text-transform:uppercase;letter-spacing:.01em}
+.btn.primary:disabled{box-shadow:none}
+.btn.tinted{border-color:transparent}
+.btn.danger{border-color:transparent}
+.btn.ghost,.btn.plain{border-color:transparent;font-family:var(--font-body);font-weight:600;min-height:44px}
+.btn.sm{min-height:36px;padding:8px 14px;border-radius:var(--r-sm);font-size:var(--fs-subhead);box-shadow:none}
+.btn.primary.pill.whdr-finish:not(.xs){min-height:40px;padding:8px 16px;border-radius:var(--r);font-size:var(--fs-subhead);box-shadow:none}
+.btn.xs{min-height:28px;padding:5px 10px;border-radius:8px;font-size:var(--fs-footnote);box-shadow:none}
+
+/* icon in a circle: the bar's actions */
+.iconbtn{background:var(--surface-3);border:1px solid var(--border)}
+.hdr .iconbtn{width:40px;height:40px;font-size:20px}
+.iconbtn.on-ss{border-color:var(--acc-line)}
+
+/* ---------------------------------------------------------------- fields -- */
+.field,.input{border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;font-weight:500}
+.field:focus,.input:focus,.field.datef:focus-visible{border-color:var(--acc-ink);box-shadow:0 0 0 1px var(--acc-ink)}
+.searchf .field,.search .input{background:var(--surface);border-radius:var(--r)}
+.stp{background:var(--surface-3);border-radius:var(--r-sm)}
+.stp .num{font-weight:500}
+
+/* chips: rectangles, never pills. On is said by lime content on the muted tone, not a lime fill. */
+.chip{border-radius:var(--r);border:1px solid var(--border);padding:8px 14px;font-size:var(--fs-footnote);font-weight:600;letter-spacing:0}
+.chip.on{background:var(--surface-3);border-color:var(--acc-line);color:var(--acc-ink);font-weight:700}
+.chip.on .dim{color:var(--label-2)}
+.tag{border-radius:6px;font-weight:600;letter-spacing:0}
+/* the achievement pill: the one place the lime is both tint and text */
+.tag.acc{
+  border-radius:99px;border:1px solid var(--acc-line);padding:4px 10px;
+  font-size:var(--fs-caption2);font-weight:700;text-transform:uppercase;letter-spacing:.14em;
+}
+:root[dir="rtl"] .tag.acc{letter-spacing:0}
+
+/* segmented control */
+/* The track is a well, one tone under whatever it sits on; the chosen segment is raised out of it. */
+.seg{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:3px}
+:root[data-theme="light"] .seg{background:var(--surface-2)}
+.seg-sel,:root:not([data-theme="light"]) .seg-sel{background:var(--surface-3);box-shadow:inset 0 0 0 1px var(--label-4)}
+:root[data-theme="light"] .seg-sel{background:var(--surface);box-shadow:inset 0 0 0 1px var(--border)}
+.seg-sel{top:3px;bottom:3px;inset-inline-start:3px;width:calc((100% - 6px)/var(--n));border-radius:9px}
+.seg button{font-size:var(--fs-footnote);font-weight:700;letter-spacing:0}
+.seg button:not(.on){font-weight:600}
+.seg.seg-scroll>button{border-radius:9px}
+.seg.seg-scroll>button.on{background:var(--surface-3);box-shadow:none}
+:root[data-theme="light"] .seg.seg-scroll>button.on{background:var(--surface)}
+
+/* switch: the knob is dark on the lime, where a white one would be lost */
+.sw{background:var(--surface-3);border:1px solid var(--border);padding:1px}
+.sw .knob{background:var(--label);box-shadow:none}
+.sw.on{border-color:transparent}
+.sw.on .knob{background:var(--on-acc)}
+
+/* --------------------------------------------------------------- progress -- */
+.wprog,.pbar,.prog-bar,#timer .bar{background:var(--surface-3)}
+.pbar{height:4px}
+.ch-mini .pbar{height:4px}
+/* a live fill glows; its track must not clip the light */
+.wprog{overflow:visible}
+.wprog i{box-shadow:var(--glow-live)}
+/* the bar that is now, or the best one */
+.wr-bar.peak{box-shadow:var(--glow-bar)}
+
+/* ----------------------------------------------------------------- bars -- */
+#tabbar{
+  background:var(--bg);background:color-mix(in srgb,var(--bg) 90%,transparent);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);
+}
+:root[data-theme="light"] #tabbar{background:var(--bg);background:color-mix(in srgb,var(--bg) 90%,transparent)}
+#tabbar button{font-size:var(--fs-caption2);font-weight:500;letter-spacing:.02em;gap:4px}
+#tabbar button .icn{font-size:24px;opacity:1;color:var(--label-2)}
+#tabbar button.on .icn{color:inherit}
+#tabbar button.start .cir{box-shadow:var(--glow-cta)}
+#tabbar button.start span{font-weight:700}
+.whdr.stick,.stats-index{border-bottom:1px solid var(--border)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  #tabbar,:root[data-theme="light"] #tabbar{background:var(--bg)}
+}
+@media (prefers-reduced-transparency: reduce){
+  #tabbar,:root[data-theme="light"] #tabbar{background:var(--bg)}
+}
+
+/* ---------------------------------------------------------------- sheets -- */
+.sheet{border-top:1px solid var(--border);padding-inline:20px}
+.sheet .grab{width:40px;height:4px;margin:8px auto 18px}
+.sheet h3{font-size:var(--fs-title3);margin-bottom:16px}
+#timer{border:1px solid var(--border);border-radius:var(--r-tile)}
+#timer .t{font-size:2rem}
+#toast{border:1px solid var(--border);border-radius:var(--r)}
+
+/* ------------------------------------------------------------ week strip -- */
+.wday{border-radius:var(--r)}
+
+/* ------------------------------------------------------------- first run -- */
+/* views/Welcome.jsx: who is training, asked once. One column of questions, a kicker above each,
+   the one lime button at the end. The same form sits in a sheet when opened from Settings. */
+.welcome{padding-top:calc(var(--sat) + 28px);padding-bottom:calc(var(--sab) + 40px)}
+.welcome-mark{font-size:40px;color:var(--acc-ink);line-height:1;margin-bottom:20px}
+.welcome-h{font-family:var(--font-display);font-size:var(--fs-large);font-weight:700;font-style:italic;letter-spacing:-.04em;line-height:1.05;margin-top:6px}
+.welcome-sub{margin:10px 0 28px;font-size:var(--fs-subhead)}
+.welcome-foot{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:18px;text-align:center}
+.wf{display:flex;flex-direction:column;gap:24px}
+.wf-l{font-size:var(--fs-caption);font-weight:700;text-transform:uppercase;letter-spacing:var(--ls-label);color:var(--label-2);margin-bottom:8px}
+.wf-q.bad .wf-l{color:var(--red)}
+.wf-q.bad .field{border-color:var(--red)}
+.wf-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.wf-chips{display:flex;flex-wrap:wrap;gap:8px}
+.wf-chips .chip{flex:1 1 auto;min-height:44px;text-align:center;text-transform:none;font-size:var(--fs-subhead)}
+.wf-num{position:relative;display:block}
+.wf-num .field{font-family:var(--font-mono);font-variant-numeric:tabular-nums;padding-inline-end:38px}
+.wf-num .field:only-child{padding-inline-end:16px}
+.wf-unit{position:absolute;inset-inline-end:12px;top:50%;transform:translateY(-50%);font-size:var(--fs-footnote);color:var(--label-2);pointer-events:none}
+.wf-pair{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.wf-pair .field{padding-inline:10px 30px}
+.wf-pair .wf-unit{inset-inline-end:8px}
+.wf-go{width:100%;margin-top:8px}
+/* three fields side by side need the room: under it the height gets a line to itself */
+@media (max-width:380px){.wf-row{grid-template-columns:1fr 1fr}.wf-row>.wf-q:nth-child(2){grid-column:1 / -1;grid-row:2}}
+:lang(ar) .wf-l,:lang(hi) .wf-l,:lang(bn) .wf-l,:lang(th) .wf-l,[dir="rtl"] .wf-l{letter-spacing:0}

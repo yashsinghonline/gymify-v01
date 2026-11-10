@@ -1,0 +1,65 @@
+# Publishes Gymify to GitHub Pages: https://<your-name>.github.io/<this-repository>/
+#
+# One-time setup in the repository: Settings → Pages → Source: "GitHub Actions". Then start it
+# from the Actions tab. Publishing on Vercel instead needs none of this: see PUBLISH.md.
+#
+# Pages serves static files only, so this is the device-only build (VITE_DEMO=1,
+# frontend/src/lib/demo.js): no server, no accounts. The app starts empty, asks who is training
+# on first open and keeps everything in that visitor's own browser.
+#
+# VITE_SOURCE_URL puts a "Source code" link to this repository on the About page. The licence
+# (AGPL-3.0, section 13) wants everyone who uses a hosted copy to be able to get its source.
+#
+# scripts/build-site.sh also puts the exercise pictures next to the build (from catalogue/media,
+# or downloaded when that folder is not in the repository). They are licensed separately from
+# the code: read NOTICE.md before publishing a copy with them. GYMIFY_MEDIA=0 leaves them out.
+name: Publish to GitHub Pages
+
+# Started by hand (Actions → Publish to GitHub Pages → Run workflow), so that pushing this
+# folder to GitHub does not start a job that fails until Pages is switched on. If Pages is
+# where you publish, add this under "on:" to republish on every push:
+#   push:
+#     branches: [main]
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - name: Build the site, with the exercise pictures
+        run: bash scripts/build-site.sh
+        env:
+          VITE_SOURCE_URL: ${{ github.server_url }}/${{ github.repository }}
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
